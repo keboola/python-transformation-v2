@@ -1,0 +1,22 @@
+{
+    "parameters": {
+        "packages": [],
+        "blocks": [
+            {
+                "name": "block 1",
+                "codes": [
+                    {
+                        "name": "code 1",
+                        "script": [
+                            "import zipfile",
+                            "with zipfile.ZipFile('in/files/src.zip', 'r') as zip_ref:",
+                            "    zip_ref.extractall('my_module/')",
+                            "from my_module.src.my_module import main",
+                            "main.work()"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

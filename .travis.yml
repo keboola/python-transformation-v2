@@ -5,6 +5,8 @@ services:
 before_script:
   - export APP_IMAGE=keboola-component
   - docker build . --tag=$APP_IMAGE
+script:
+  - docker-compose run --rm --entrypoint python dev -m unittest tests/transformationTest.py
 after_success:
   - docker images
 deploy:

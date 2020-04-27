@@ -1,0 +1,52 @@
+{
+    "parameters": {
+        "blocks": [
+            {
+                "name": "block 1",
+                "codes": [
+                    {
+                        "name":"code 1",
+                        "script": [
+                            "import sys",
+                            "import csv",
+                            "",
+                            "inFilePath = 'in/tables/sample.csv'",
+                            "outFilePath = 'out/tables/sample.csv'",
+                            "csvDelimiter = ','",
+                            "csvQuoteChar = '\"'",
+                            "",
+                            "with open(inFilePath, 'rt') as inFile, open(outFilePath, 'wt') as outFile:",
+                            "    reader = csv.DictReader(inFile, delimiter = csvDelimiter, quotechar = csvQuoteChar)",
+                            "    next(reader, None)  # skip the headers",
+                            "    writer = csv.DictWriter(outFile, fieldnames = ['funkyNumber', 'whatever', 'biggerFunky'], lineterminator='\\n', delimiter=csvDelimiter, quotechar=csvQuoteChar)",
+                            "    writer.writeheader()",
+                            "    for row in reader:",
+                            "        writer.writerow({",
+                            "            'funkyNumber': row['funkyNumber'],",
+                            "            'whatever': row['whatever'],",
+                            "            'biggerFunky': int(row['funkyNumber']) ** 3",
+                            "        })"
+                        ]
+                    },
+                    {
+                        "name":"code 2",
+                        "script": [
+                            "print('asd')"
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "block 2",
+                "codes": [
+                    {
+                        "name":"code 3",
+                        "script": [
+                            "print('asd')"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
