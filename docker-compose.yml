@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app: &main
+    build: .
+    image: keboola/python-transformation-v2
+    tty: true
+    stdin_open: true
+    command: bash
+    environment:
+      - "KBC_DATADIR=/code/tests"
+  dev:
+    <<: *main
+    volumes:
+      - ./:/code
+      - ./data:/data
