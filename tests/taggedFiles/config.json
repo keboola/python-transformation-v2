@@ -1,0 +1,32 @@
+{
+    "parameters": {
+        "packages": [],
+        "tags": ["model", "pokus"],
+        "blocks": [
+            {
+                "name": "block 1",
+                "codes": [
+                    {
+                        "name": "code 1",
+                        "script": [
+                            "import os",
+                            "import csv",
+                            "",
+                            "with open('in/user/model', 'rt') as inFile:",
+                            "   modelData = inFile.read()",
+                            "",
+                            "with open('in/user/pokus', 'rt') as inFile:",
+                            "   pokusData = inFile.read()",
+                            "",
+                            "result = int(modelData) + int(pokusData)",
+                            "with open('out/tables/sample.csv', 'wt') as outFile:",
+                            "   writer = csv.DictWriter(outFile, fieldnames = ['x'], lineterminator='\\n', delimiter=',', quotechar='\"')",
+                            "   writer.writeheader()",
+                            "   writer.writerow({'x': result})"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

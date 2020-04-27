@@ -1,0 +1,18 @@
+{
+    "parameters": {
+        "packages": ["matrix", "some-non-existent-package"],
+        "blocks": [
+            {
+                "name": "block 1",
+                "codes": [
+                    {
+                        "name": "code 1",
+                        "script": [
+                            "import matrix"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
