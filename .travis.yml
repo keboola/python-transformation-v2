@@ -3,7 +3,7 @@ language: bash
 services:
   - docker
 before_script:
-  - export APP_IMAGE=keboola-component
+  - export APP_IMAGE=keboola-python-transformation-v2
   - docker build . --tag=$APP_IMAGE
 script:
   - docker-compose run --rm --entrypoint python dev -m unittest tests/transformationTest.py
