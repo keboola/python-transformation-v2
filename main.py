@@ -3,7 +3,7 @@ import sys
 import traceback
 
 try:
-    app = Transformation('/data')
+    app = Transformation('/data/')
     app.execute()
 except ValueError as err:
     print(err, file=sys.stderr)
