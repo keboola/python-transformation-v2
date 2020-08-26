@@ -1,4 +1,4 @@
-FROM quay.io/keboola/docker-custom-python:latest
+FROM quay.io/keboola/docker-custom-python:2.0.4
 
 COPY . /code/
 WORKDIR /code/
