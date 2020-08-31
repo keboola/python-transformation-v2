@@ -76,7 +76,7 @@ class Transformation:
     @staticmethod
     def script_excerpt(script):
         if len(script) > 1000:
-            return script[0, 500] + '\n...\n' + script[-500]
+            return script[0 : 500] + '\n...\n' + script[-500]
         else:
             return script
 
