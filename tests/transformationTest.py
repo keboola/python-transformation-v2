@@ -11,6 +11,19 @@ class TransformationTest(unittest.TestCase):
         else:
             self.data_dir = '.'
 
+    def test_long_script_text(self):
+        data_dir = self.data_dir + '/longScript/'
+        result_file = os.path.abspath(data_dir + '/out/tables/sample.csv')
+        app = Transformation(data_dir)
+        app.execute()
+
+        self.assertTrue(os.path.isfile(result_file))
+        with open(result_file, 'rt') as sample:
+            csv_reader = csv.DictReader(sample, delimiter=',', quotechar='"')
+            for row in csv_reader:
+                self.assertEqual(int(row['biggerFunky']),
+                                 (int(row['funkyNumber']) ** 3))
+
     def test_transformData(self):
         data_dir = self.data_dir + '/transformData/'
         result_file = os.path.abspath(data_dir + '/out/tables/sample.csv')

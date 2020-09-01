@@ -1,0 +1,17 @@
+{
+    "parameters": {
+        "blocks": [
+            {
+                "name": "block 1",
+                "codes": [
+                    {
+                        "name":"code 1",
+                        "script": [
+                            "import sys\nimport csv\ninFilePath = 'in/tables/sample.csv'\noutFilePath = 'out/tables/sample.csv'\ncsvDelimiter = ','\ncsvQuoteChar = '\"'\nwith open(inFilePath, 'rt') as inFile, open(outFilePath, 'wt') as outFile:\n\treader = csv.DictReader(inFile, delimiter = csvDelimiter, quotechar = csvQuoteChar)\n\tnext(reader, None)  # skip the headers\n\twriter = csv.DictWriter(outFile, fieldnames = ['funkyNumber', 'whatever', 'biggerFunky'], lineterminator='\\n', delimiter=csvDelimiter, quotechar=csvQuoteChar)\n\twriter.writeheader()\n\tfor row in reader:\n\t\twriter.writerow({\n\t\t\t'funkyNumber': row['funkyNumber'],\n\t\t\t'whatever': row['whatever'],\n\t\t\t'biggerFunky': int(row['funkyNumber']) ** 3\n\t\t})\nprint('very long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long text')"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
