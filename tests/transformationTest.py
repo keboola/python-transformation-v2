@@ -1,15 +1,22 @@
 from src.transformation import Transformation
 import unittest
 import os
+import shutil
 import csv
 
 
 class TransformationTest(unittest.TestCase):
-    def setUp(self):
-        if os.getenv('KBC_DATADIR') is not None:
-            self.data_dir = os.getenv('KBC_DATADIR')
-        else:
-            self.data_dir = '.'
+    @classmethod
+    def setUpClass(self):
+        # Container is in the production runned with "www-data" user,
+        # so we want to test it in the same way.
+        # Code directory is not writtable for "www-data" user, so we use /tmp dir.
+        tests_dir = '/code/tests'
+        tmp_dir = '/tmp/tests'
+        if os.path.exists(tmp_dir) and os.path.isdir(tmp_dir):
+            shutil.rmtree(tmp_dir)
+        shutil.copytree(tests_dir, tmp_dir)
+        self.data_dir = tmp_dir
 
     def test_long_script_text(self):
         data_dir = self.data_dir + '/longScript/'
