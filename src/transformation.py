@@ -90,6 +90,8 @@ class Transformation:
                 '-m', 'pip', 'install',
                 '--disable-pip-version-check',
                 '--no-cache-dir',
+                '--user',
+                '--no-warn-script-location', # ignore error: installed in '/var/www/.local/bin' which is not on PATH.
                 '--force-reinstall',
                 package
             ]
