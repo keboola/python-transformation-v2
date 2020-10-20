@@ -6,9 +6,9 @@ services:
     user: www-data
     tty: true
     stdin_open: true
-    command: bash
   dev:
     <<: *main
+    command: bash
     volumes:
       - ./:/code
       - ./data:/data
