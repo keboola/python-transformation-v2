@@ -4,7 +4,6 @@ import os
 import shutil
 import csv
 
-
 class TransformationTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
@@ -43,6 +42,16 @@ class TransformationTest(unittest.TestCase):
             for row in csv_reader:
                 self.assertEqual(int(row['biggerFunky']),
                                  (int(row['funkyNumber']) ** 3))
+
+    def test_package(self):
+        data_dir = self.data_dir + '/package/'
+        result_file = os.path.abspath(data_dir + '/out/files/out.txt')
+        app = Transformation(data_dir)
+        app.execute()
+        with open(result_file, 'rt') as file:
+            # Cup of coffee, result of the "art" package
+            self.assertEqual('c[_]', file.read().strip())
+
     def test_tagged_files(self,):
         data_dir = self.data_dir + '/taggedFiles/'
         # generate absolute path before the application is run, because it
