@@ -95,8 +95,6 @@ class Transformation:
                 '--force-reinstall',
                 package
             ]
-            if user_option:
-                args.insert(6, '--user')
             if subprocess.call(args) != 0:
                 raise ValueError('Failed to install package: ' + package)
 
