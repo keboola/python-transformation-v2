@@ -1,0 +1,21 @@
+{
+    "parameters": {
+        "packages": ["art"],
+        "blocks": [
+            {
+                "name": "block 1",
+                "codes": [
+                    {
+                        "name":"code 1",
+                        "script": [
+                            "from art import *",
+                            "outFilePath = 'out/files/out.txt'",
+                            "with open(outFilePath, 'wt') as file:",
+                            "  file.write(art(\"coffee\"))"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

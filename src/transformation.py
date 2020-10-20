@@ -3,7 +3,6 @@ from keboola import docker
 import os
 import sys
 
-
 class Transformation:
     def __init__(self, data_dir=None):
         self.dataDir = data_dir
@@ -95,8 +94,6 @@ class Transformation:
                 '--force-reinstall',
                 package
             ]
-            if user_option:
-                args.insert(6, '--user')
             if subprocess.call(args) != 0:
                 raise ValueError('Failed to install package: ' + package)
 
