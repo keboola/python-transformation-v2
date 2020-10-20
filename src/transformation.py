@@ -3,7 +3,6 @@ from keboola import docker
 import os
 import sys
 
-
 class Transformation:
     def __init__(self, data_dir=None):
         self.dataDir = data_dir
