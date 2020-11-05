@@ -24,16 +24,18 @@ class Transformation:
             tags = []
         self.prepare_tagged_files(cfg, tags)
 
-        # Process and execute transformation scripts
-        script_file = cfg.get_data_dir() + 'script.py'
-        file = open(script_file, 'w+')
-        self.process_blocks(parameters.get('blocks'), file)
-        file.seek(os.SEEK_SET)
-        self.execute_script_file(cfg, file)
-        file.close()
+        blocks = parameters.get('blocks')
+        if blocks is not None:
+            # Process and execute transformation scripts
+            script_file = cfg.get_data_dir() + 'script.py'
+            file = open(script_file, 'w+')
+            self.process_blocks(blocks, file)
+            file.seek(os.SEEK_SET)
+            self.execute_script_file(cfg, file)
+            file.close()
 
-        # remove temp file
-        os.remove(script_file)
+            # remove temp file
+            os.remove(script_file)
 
     def process_blocks(self, blocks, file):
         for block in blocks:
