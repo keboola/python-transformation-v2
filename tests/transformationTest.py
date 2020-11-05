@@ -30,6 +30,12 @@ class TransformationTest(unittest.TestCase):
                 self.assertEqual(int(row['biggerFunky']),
                                  (int(row['funkyNumber']) ** 3))
 
+
+    def test_emptyConfig(self):
+        data_dir = self.data_dir + '/emptyConfig/'
+        app = Transformation(data_dir)
+        app.execute()
+
     def test_transformData(self):
         data_dir = self.data_dir + '/transformData/'
         result_file = os.path.abspath(data_dir + '/out/tables/sample.csv')
