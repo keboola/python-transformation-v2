@@ -1,4 +1,4 @@
-FROM quay.io/keboola/docker-custom-python:2.0.4
+FROM quay.io/keboola/docker-custom-python:2.2.0
 
 # Create directory for user packages
 # This directory is usually created automatically by pip
@@ -13,4 +13,4 @@ RUN chown -R www-data:www-data /var/www
 
 COPY . /code/
 WORKDIR /code/
-CMD ["python", "-u", "/code/main.py"]
+CMD ["python", "-X", "faulthandler" "-u", "/code/main.py"]
