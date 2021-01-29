@@ -34,9 +34,6 @@ class Transformation:
             self.execute_script_file(cfg, file)
             file.close()
 
-            # remove temp file
-            os.remove(script_file)
-
     def process_blocks(self, blocks, file):
         for block in blocks:
             print('Processing block "%s"' % (block.get('name')))
