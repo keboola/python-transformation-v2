@@ -13,4 +13,4 @@ RUN chown -R www-data:www-data /var/www
 
 COPY . /code/
 WORKDIR /code/
-CMD ["python", "-X", "faulthandler" "-u", "/code/main.py"]
+CMD ["python", "-X", "faulthandler", "-u", "/code/main.py"]
