@@ -1,4 +1,4 @@
-FROM quay.io/keboola/docker-custom-python:2.2.0
+FROM quay.io/keboola/docker-custom-python:2.4.0
 
 # Create directory for user packages
 # This directory is usually created automatically by pip
