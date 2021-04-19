@@ -55,7 +55,7 @@ jobs:
       - script: docker-compose build app
         displayName: 'Build'
 
-      - script: docker-compose run --rm app --entrypoint python dev -m unittest tests/transformationTest.py
+      - script: docker-compose run --rm --entrypoint python dev -m unittest tests/transformationTest.py
         displayName: 'Run tests'
 
       - script: |
