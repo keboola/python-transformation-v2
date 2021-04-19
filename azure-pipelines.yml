@@ -44,7 +44,7 @@ jobs:
           BASE_TAG=$(cat keboola.docker-custom-python.latest-build/base-python-artifact)
           rm -rf keboola.docker-custom-python.latest-build
           echo "Base Tag: $BASE_TAG"
-          BASE_IMAGE=quay.io/keboola/docker-custom-python:$BASE_TAG
+          BASE_IMAGE=keboola.azurecr.io/docker-custom-python:$BASE_TAG
           echo "Base Image: $BASE_IMAGE"
           touch build/Dockerfile
           echo "FROM $BASE_IMAGE" | cat - ./Dockerfile > ./build/Dockerfile
