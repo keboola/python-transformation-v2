@@ -16,19 +16,19 @@ eval $(docker run --rm \
     ecr:get-login ${KBC_DEVELOPERPORTAL_VENDOR} ${KBC_DEVELOPERPORTAL_APP})
 
 # Push to the repository
-docker tag ${APP_IMAGE}:latest ${REPOSITORY}:${TRAVIS_TAG}
+docker tag ${APP_IMAGE}:latest ${REPOSITORY}:${APP_TAG}
 docker tag ${APP_IMAGE}:latest ${REPOSITORY}:latest
-docker push ${REPOSITORY}:${TRAVIS_TAG}
+docker push ${REPOSITORY}:${APP_TAG}
 docker push ${REPOSITORY}:latest
 
 # Update the tag in Keboola Developer Portal -> Deploy to KBC
-if echo ${TRAVIS_TAG} | grep -c '^v\?[0-9]\+\.[0-9]\+\.[0-9]\+$'
+if echo ${APP_TAG} | grep -c '^v\?[0-9]\+\.[0-9]\+\.[0-9]\+$'
 then
     docker run --rm \
         -e KBC_DEVELOPERPORTAL_USERNAME \
         -e KBC_DEVELOPERPORTAL_PASSWORD \
         quay.io/keboola/developer-portal-cli-v2:latest \
-        update-app-repository ${KBC_DEVELOPERPORTAL_VENDOR} ${KBC_DEVELOPERPORTAL_APP} ${TRAVIS_TAG} ecr ${REPOSITORY}
+        update-app-repository ${KBC_DEVELOPERPORTAL_VENDOR} ${KBC_DEVELOPERPORTAL_APP} ${APP_TAG} ecr ${REPOSITORY}
 else
-    echo "Skipping deployment to KBC, tag ${TRAVIS_TAG} is not allowed."
+    echo "Skipping deployment to KBC, tag ${APP_TAG} is not allowed."
 fi
