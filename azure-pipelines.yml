@@ -52,8 +52,15 @@ jobs:
         displayName: Get Latest Tag and create dockerfile
         name: get_build
 
-      - script: docker-compose build app
-        displayName: 'Build'
+      - task: DockerCompose@0
+        inputs:
+          containerregistrytype: 'Azure Container Registry'
+          azureSubscription: 'ACR'
+          azureContainerRegistry: '{"loginServer":"keboola.azurecr.io", "id" : "/subscriptions/951eaeee-8981-4b7b-b1fd-12145a2fa848/resourceGroups/keboola-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/keboola"}'
+          dockerComposeFile: '**/docker-compose.yml'
+          dockerComposeCommand: 'build'
+          action: 'Run a Docker Compose command'
+        displayName: 'Build the image'
 
       - script: docker-compose run --rm --entrypoint python dev -m unittest tests/transformationTest.py
         displayName: 'Run tests'
