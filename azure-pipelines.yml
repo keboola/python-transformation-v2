@@ -1,0 +1,95 @@
+variables:
+  - name: imageTag
+    value: ${{ replace(variables['Build.SourceBranch'],'refs/tags/','') }}
+  - name: isTaggedBuild
+    value: ${{ startsWith(variables['Build.SourceBranch'],'refs/tags/') }}
+  - name: azureContainerRegistry
+    value: 'Keboola ACR'
+  - name: imageRepository
+    value: 'python-transformation-v2'
+
+pr: none
+trigger:
+  # Build is triggered only in branches except master
+  # It servers for development, in Azure DevOps is configured Release pipeline triggered by change of base image
+  branches:
+    include: ['*']
+    exclude: ['master']
+  tags:
+    include: [ '*' ]
+
+jobs:
+  - job: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+      - script: docker info
+        displayName: 'Info'
+
+      - script: echo '##vso[task.setvariable variable=imageTag]$(Build.BuildId)'
+        displayName: "Set the imageTag to buildId if it's not a tag build"
+        condition: eq(variables['isTaggedBuild'], 'false')
+
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: 'specific'
+          project: '188d0476-74e5-44c1-85af-bb2689f015f3'
+          definition: '16'
+          specificBuildWithTriggering: true
+          buildVersionToDownload: 'latest'
+          targetPath: '$(Build.SourcesDirectory)'
+
+      - script: |
+          set -Eeuo pipefail
+          BASE_TAG=$(cat keboola.docker-custom-python.latest-build/base-python-artifact)
+          rm -rf keboola.docker-custom-python.latest-build
+          echo "Base Tag: $BASE_TAG"
+          BASE_IMAGE=keboola.azurecr.io/docker-custom-python:$BASE_TAG
+          echo "Base Image: $BASE_IMAGE"
+          touch build/Dockerfile
+          echo "FROM $BASE_IMAGE" | cat - ./Dockerfile > ./build/Dockerfile
+          echo "##vso[task.setvariable variable=BASE_TAG;isOutput=true]$BASE_TAG"
+        displayName: Get Latest Tag and create dockerfile
+        name: get_build
+
+      - task: DockerCompose@0
+        inputs:
+          containerregistrytype: 'Azure Container Registry'
+          azureSubscription: 'ACR'
+          azureContainerRegistry: '{"loginServer":"keboola.azurecr.io", "id" : "/subscriptions/951eaeee-8981-4b7b-b1fd-12145a2fa848/resourceGroups/keboola-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/keboola"}'
+          dockerComposeFile: '**/docker-compose.yml'
+          dockerComposeCommand: 'build'
+          action: 'Run a Docker Compose command'
+        displayName: 'Build the image'
+
+      - script: docker-compose run --rm --entrypoint python dev -m unittest tests/transformationTest.py
+        displayName: 'Run tests'
+
+      - script: |
+          docker tag keboola/python-transformation-v2 $(APP_IMAGE):latest
+          docker tag keboola/python-transformation-v2 $(APP_IMAGE):$(imageTag)
+        condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
+        displayName: 'Tag the build'
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: $(azureContainerRegistry)
+          repository: $(imageRepository)
+          command: 'push'
+          tags: |
+            latest
+            $(imageTag)
+        condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
+        displayName: 'Push to ACR'
+
+      - script: ./deploy.sh
+        env:
+          APP_IMAGE: $(APP_IMAGE)
+          KBC_DEVELOPERPORTAL_APP: $(KBC_DEVELOPERPORTAL_APP)
+          KBC_DEVELOPERPORTAL_PASSWORD: $(KBC_DEVELOPERPORTAL_PASSWORD)
+          KBC_DEVELOPERPORTAL_USERNAME: $(KBC_DEVELOPERPORTAL_USERNAME)
+          KBC_DEVELOPERPORTAL_VENDOR: $(KBC_DEVELOPERPORTAL_VENDOR)
+          APP_TAG: $(imageTag)
+        condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
+        displayName: "Deploy to Dev Portal"
+
