@@ -82,7 +82,7 @@ jobs:
         condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
         displayName: 'Push to ACR'
 
-      - script: deploy.sh
+      - script: ./deploy.sh
         env:
           APP_IMAGE: $(APP_IMAGE)
           KBC_DEVELOPERPORTAL_APP: $(KBC_DEVELOPERPORTAL_APP)
