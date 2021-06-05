@@ -41,13 +41,14 @@ jobs:
 
       - script: |
           set -Eeuo pipefail
-          if [ -z ${$BASE_TAG} ] ; then
+
+          if [[ -z ${BASE_TAG} ]] ; then
             export BASE_TAG=$(cat keboola.docker-custom-python.latest-build/base-python-artifact)
           fi
           rm -rf keboola.docker-custom-python.latest-build
-          printf "Base Tag: $BASE_TAG"
+          printf "Base Tag: $BASE_TAG\n"
           export BASE_IMAGE=keboola.azurecr.io/docker-custom-python:$BASE_TAG
-          printf "Base Image: $BASE_IMAGE"          
+          printf "Base Image: $BASE_IMAGE\n"
           ./create_dockerfile.sh
           echo "##vso[task.setvariable variable=BASE_TAG;isOutput=true]$BASE_TAG"
         displayName: Get Latest Tag and create dockerfile
