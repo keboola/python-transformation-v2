@@ -54,45 +54,45 @@ jobs:
         displayName: Get Latest Tag and create dockerfile
         name: get_build
         env:
-          BASE_TAG: $(BASE_TAG)
+          BASE_TAG: '$(BASE_TAG)'
 
-      # - task: DockerCompose@0
-      #   inputs:
-      #     containerregistrytype: 'Azure Container Registry'
-      #     azureSubscription: 'ACR'
-      #     azureContainerRegistry: '{"loginServer":"keboola.azurecr.io", "id" : "/subscriptions/951eaeee-8981-4b7b-b1fd-12145a2fa848/resourceGroups/keboola-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/keboola"}'
-      #     dockerComposeFile: '**/docker-compose.yml'
-      #     dockerComposeCommand: 'build'
-      #     action: 'Run a Docker Compose command'
-      #   displayName: 'Build the image'
+      - task: DockerCompose@0
+        inputs:
+          containerregistrytype: 'Azure Container Registry'
+          azureSubscription: 'ACR'
+          azureContainerRegistry: '{"loginServer":"keboola.azurecr.io", "id" : "/subscriptions/951eaeee-8981-4b7b-b1fd-12145a2fa848/resourceGroups/keboola-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/keboola"}'
+          dockerComposeFile: '**/docker-compose.yml'
+          dockerComposeCommand: 'build'
+          action: 'Run a Docker Compose command'
+        displayName: 'Build the image'
 
-      # - script: docker-compose run --rm --entrypoint python dev -m unittest tests/transformationTest.py
-      #   displayName: 'Run tests'
+      - script: docker-compose run --rm --entrypoint python dev -m unittest tests/transformationTest.py
+        displayName: 'Run tests'
 
-      # - script: |
-      #     docker tag keboola/python-transformation-v2 $(APP_IMAGE):latest
-      #     docker tag keboola/python-transformation-v2 $(APP_IMAGE):$(imageTag)
-      #   condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
-      #   displayName: 'Tag the build'
+      - script: |
+          docker tag keboola/python-transformation-v2 $(APP_IMAGE):latest
+          docker tag keboola/python-transformation-v2 $(APP_IMAGE):$(imageTag)
+        condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
+        displayName: 'Tag the build'
 
-      # - task: Docker@2
-      #   inputs:
-      #     containerRegistry: $(azureContainerRegistry)
-      #     repository: $(imageRepository)
-      #     command: 'push'
-      #     tags: |
-      #       latest
-      #       $(imageTag)
-      #   condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
-      #   displayName: 'Push to ACR'
+      - task: Docker@2
+        inputs:
+          containerRegistry: $(azureContainerRegistry)
+          repository: $(imageRepository)
+          command: 'push'
+          tags: |
+            latest
+            $(imageTag)
+        condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
+        displayName: 'Push to ACR'
 
-      # - script: ./deploy.sh
-      #   env:
-      #     APP_IMAGE: $(APP_IMAGE)
-      #     KBC_DEVELOPERPORTAL_APP: $(KBC_DEVELOPERPORTAL_APP)
-      #     KBC_DEVELOPERPORTAL_PASSWORD: $(KBC_DEVELOPERPORTAL_PASSWORD)
-      #     KBC_DEVELOPERPORTAL_USERNAME: $(KBC_DEVELOPERPORTAL_USERNAME)
-      #     KBC_DEVELOPERPORTAL_VENDOR: $(KBC_DEVELOPERPORTAL_VENDOR)
-      #     APP_TAG: $(imageTag)
-      #   condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
-      #   displayName: "Deploy to Dev Portal"
+      - script: ./deploy.sh
+        env:
+          APP_IMAGE: $(APP_IMAGE)
+          KBC_DEVELOPERPORTAL_APP: $(KBC_DEVELOPERPORTAL_APP)
+          KBC_DEVELOPERPORTAL_PASSWORD: $(KBC_DEVELOPERPORTAL_PASSWORD)
+          KBC_DEVELOPERPORTAL_USERNAME: $(KBC_DEVELOPERPORTAL_USERNAME)
+          KBC_DEVELOPERPORTAL_VENDOR: $(KBC_DEVELOPERPORTAL_VENDOR)
+          APP_TAG: $(imageTag)
+        condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
+        displayName: "Deploy to Dev Portal"
