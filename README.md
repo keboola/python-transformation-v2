@@ -16,3 +16,7 @@ pip install --upgrade git+git://github.com/keboola/python-transformation-v2.git
 
 ### Run tests
 - `docker-compose run --rm python-transformation-v2`
+
+## License
+
+MIT licensed, see [LICENSE](./LICENSE) file.
