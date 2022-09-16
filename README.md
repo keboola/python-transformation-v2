@@ -10,9 +10,8 @@ pip install --upgrade git+git://github.com/keboola/python-transformation-v2.git
 
 ### Dev
 - clone the repo
-- `export BASE_IMAGE=quay.io/keboola/docker-custom-python:latest` or provide the tag you want, say `2.2.0`
-- `./create_dockerfile.sh`
-- `docker-compose build`
+- `docker-compose build --build-arg BASE_IMAGE=quay.io/keboola/docker-custom-python:latest`
+  or provide the tag you want, say `2.2.0`
 
 ### Run tests
 - `docker-compose run --rm python-transformation-v2`

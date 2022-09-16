@@ -1,3 +1,5 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
 
 # Create directory for user packages
 # This directory is usually created automatically by pip

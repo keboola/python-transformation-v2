@@ -1,13 +1,12 @@
 version: '3'
 services:
-  app: &main
-    build:
-      context: .
-      dockerfile: build/Dockerfile
+  python-transformation-v2: &main
+    build: .
     image: keboola/python-transformation-v2
     user: www-data
     tty: true
     stdin_open: true
+
   dev:
     <<: *main
     command: bash

@@ -23,9 +23,6 @@ jobs:
     pool:
       vmImage: ubuntu-latest
     steps:
-      - script: docker info
-        displayName: 'Info'
-
       - script: echo '##vso[task.setvariable variable=imageTag]$(Build.BuildId)'
         displayName: "Set the imageTag to buildId if it's not a tag build"
         condition: eq(variables['isTaggedBuild'], 'false')
@@ -41,33 +38,23 @@ jobs:
 
       - script: |
           set -Eeuo pipefail
-
           if [[ -z ${BASE_TAG} ]] ; then
-            export BASE_TAG=$(cat keboola.docker-custom-python.latest-build/base-python-artifact)
+            BASE_TAG=$(cat keboola.docker-custom-python.latest-build/base-python-artifact)
           fi
-          rm -rf keboola.docker-custom-python.latest-build
-          printf "Base Tag: $BASE_TAG\n"
-          export BASE_IMAGE=keboola.azurecr.io/docker-custom-python:$BASE_TAG
-          printf "Base Image: $BASE_IMAGE\n"
-          ./create_dockerfile.sh
-          echo "##vso[task.setvariable variable=BASE_TAG;isOutput=true]$BASE_TAG"
-        displayName: Get Latest Tag and create dockerfile
-        name: get_build
-        env:
-          BASE_TAG: '$(BASE_TAG)'
+          echo "Base Tag: $BASE_TAG"
+          
+          BASE_IMAGE=keboola.azurecr.io/docker-custom-python:$BASE_TAG
+          echo "Base Image: $BASE_IMAGE"
+          
+          echo "##vso[task.setvariable variable=BASE_TAG]$BASE_TAG"
+          echo "##vso[task.setvariable variable=BASE_IMAGE]$BASE_IMAGE"
+        displayName: Resolve Latest Tag
 
-      - task: DockerCompose@0
-        inputs:
-          containerregistrytype: 'Azure Container Registry'
-          azureSubscription: 'ACR'
-          azureContainerRegistry: '{"loginServer":"keboola.azurecr.io", "id" : "/subscriptions/951eaeee-8981-4b7b-b1fd-12145a2fa848/resourceGroups/keboola-acr-prod-rg/providers/Microsoft.ContainerRegistry/registries/keboola"}'
-          dockerComposeFile: '**/docker-compose.yml'
-          dockerComposeCommand: 'build'
-          action: 'Run a Docker Compose command'
-        displayName: 'Build the image'
+      - script: docker-compose build --build-arg BASE_IMAGE=$(BASE_IMAGE) python-transformation-v2
+        displayName: Build
 
-      - script: docker-compose run --rm --entrypoint python dev -m unittest tests/transformationTest.py
-        displayName: 'Run tests'
+      - script: docker-compose run --rm --entrypoint python python-transformation-v2 -m unittest tests/transformationTest.py
+        displayName: Run tests
 
       - script: |
           docker tag keboola/python-transformation-v2 $(APP_IMAGE):latest
