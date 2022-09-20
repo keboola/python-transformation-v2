@@ -10,12 +10,12 @@ services:
     tty: true
     stdin_open: true
 
-  snowpark-transformation:
+  python-snowpark-transformation:
     build:
       context: .
       args:
         BASE_IMAGE_NAME: keboola.azurecr.io/docker-python-snowpark
-    image: keboola/snowpark-transformation
+    image: keboola/python-snowpark-transformation
     user: www-data
     tty: true
     stdin_open: true
