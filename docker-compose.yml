@@ -1,8 +1,21 @@
 version: '3'
 services:
   python-transformation-v2: &main
-    build: .
+    build:
+      context: .
+      args:
+        BASE_IMAGE_NAME: keboola.azurecr.io/docker-custom-python
     image: keboola/python-transformation-v2
+    user: www-data
+    tty: true
+    stdin_open: true
+
+  snowpark-transformation:
+    build:
+      context: .
+      args:
+        BASE_IMAGE_NAME: keboola.azurecr.io/docker-python-snowpark
+    image: keboola/snowpark-transformation
     user: www-data
     tty: true
     stdin_open: true

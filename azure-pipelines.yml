@@ -1,12 +1,10 @@
 variables:
-  - name: imageTag
-    value: ${{ replace(variables['Build.SourceBranch'],'refs/tags/','') }}
   - name: isTaggedBuild
     value: ${{ startsWith(variables['Build.SourceBranch'],'refs/tags/') }}
+  - name: imageTag
+    value: ${{ replace(variables['Build.SourceBranch'],'refs/tags/','') }}
   - name: azureContainerRegistry
-    value: 'Keboola ACR'
-  - name: imageRepository
-    value: 'python-transformation-v2'
+    value: Keboola ACR
 
 pr: none
 trigger:
@@ -18,15 +16,13 @@ trigger:
   tags:
     include: [ '*' ]
 
-jobs:
-  - job: Build
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-      - script: echo '##vso[task.setvariable variable=imageTag]$(Build.BuildId)'
-        displayName: "Set the imageTag to buildId if it's not a tag build"
-        condition: eq(variables['isTaggedBuild'], 'false')
+pool:
+  vmImage: ubuntu-latest
 
+jobs:
+  - job:
+    displayName: Build Python Transformation
+    steps:
       - task: DownloadPipelineArtifact@2
         inputs:
           buildType: 'specific'
@@ -42,44 +38,96 @@ jobs:
             BASE_TAG=$(cat keboola.docker-custom-python.latest-build/base-python-artifact)
           fi
           echo "Base Tag: $BASE_TAG"
-          
-          BASE_IMAGE=keboola.azurecr.io/docker-custom-python:$BASE_TAG
-          echo "Base Image: $BASE_IMAGE"
-          
+
           echo "##vso[task.setvariable variable=BASE_TAG]$BASE_TAG"
-          echo "##vso[task.setvariable variable=BASE_IMAGE]$BASE_IMAGE"
         displayName: Resolve Latest Tag
 
-      - script: docker-compose build --build-arg BASE_IMAGE=$(BASE_IMAGE) python-transformation-v2
+      - script: docker-compose build --build-arg BASE_IMAGE_TAG=python-3.10-$(BASE_TAG) python-transformation-v2
         displayName: Build
 
       - script: docker-compose run --rm --entrypoint python python-transformation-v2 -m unittest tests/transformationTest.py
         displayName: Run tests
 
       - script: |
-          docker tag keboola/python-transformation-v2 $(APP_IMAGE):latest
-          docker tag keboola/python-transformation-v2 $(APP_IMAGE):$(imageTag)
+          docker tag keboola/python-transformation-v2 keboola.azurecr.io/python-transformation-v2:latest
+          docker tag keboola/python-transformation-v2 keboola.azurecr.io/python-transformation-v2:$(imageTag)
         condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
-        displayName: 'Tag the build'
+        displayName: Tag the build
 
       - task: Docker@2
         inputs:
           containerRegistry: $(azureContainerRegistry)
-          repository: $(imageRepository)
-          command: 'push'
+          repository: python-transformation-v2
+          command: push
           tags: |
             latest
             $(imageTag)
         condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
-        displayName: 'Push to ACR'
+        displayName: Push to ACR
 
       - script: ./deploy.sh
         env:
-          APP_IMAGE: $(APP_IMAGE)
+          APP_IMAGE: keboola.azurecr.io/python-transformation-v2
           KBC_DEVELOPERPORTAL_APP: $(KBC_DEVELOPERPORTAL_APP)
           KBC_DEVELOPERPORTAL_PASSWORD: $(KBC_DEVELOPERPORTAL_PASSWORD)
           KBC_DEVELOPERPORTAL_USERNAME: $(KBC_DEVELOPERPORTAL_USERNAME)
           KBC_DEVELOPERPORTAL_VENDOR: $(KBC_DEVELOPERPORTAL_VENDOR)
           APP_TAG: $(imageTag)
         condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
-        displayName: "Deploy to Dev Portal"
+        displayName: Deploy to Dev Portal
+
+  - job:
+    displayName: Build Snowpark Transformation
+    steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: 'specific'
+          project: '188d0476-74e5-44c1-85af-bb2689f015f3'
+          definition: '16'
+          specificBuildWithTriggering: true
+          buildVersionToDownload: 'latest'
+          targetPath: '$(Build.SourcesDirectory)'
+
+      - script: |
+          set -Eeuo pipefail
+          if [[ -z ${BASE_TAG} ]] ; then
+            BASE_TAG=$(cat keboola.docker-custom-python.latest-build/base-python-artifact)
+          fi
+          echo "Base Tag: $BASE_TAG"
+
+          echo "##vso[task.setvariable variable=BASE_TAG]$BASE_TAG"
+        displayName: Resolve Latest Tag
+
+      - script: docker-compose build --build-arg BASE_IMAGE_TAG=$(BASE_TAG) snowpark-transformation
+        displayName: Build
+
+      - script: docker-compose run --rm --entrypoint python snowpark-transformation -m unittest tests/transformationTest.py
+        displayName: Run tests
+
+      - script: |
+          docker tag keboola/snowpark-transformation keboola.azurecr.io/python-snowpark-transformation:latest
+          docker tag keboola/snowpark-transformation keboola.azurecr.io/python-snowpark-transformation:$(imageTag)
+        condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
+        displayName: Tag the build
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: $(azureContainerRegistry)
+          repository: snowpark-transformation
+          command: push
+          tags: |
+            latest
+            $(imageTag)
+        condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
+        displayName: Push to ACR
+
+      - script: ./deploy.sh
+        env:
+          APP_IMAGE: keboola.azurecr.io/python-snowpark-transformation
+          KBC_DEVELOPERPORTAL_APP: $(KBC_DEVELOPERPORTAL_APP)
+          KBC_DEVELOPERPORTAL_PASSWORD: $(KBC_DEVELOPERPORTAL_PASSWORD)
+          KBC_DEVELOPERPORTAL_USERNAME: $(KBC_DEVELOPERPORTAL_USERNAME)
+          KBC_DEVELOPERPORTAL_VENDOR: $(KBC_DEVELOPERPORTAL_VENDOR)
+          APP_TAG: $(imageTag)
+        condition: and(succeeded(), eq(variables['isTaggedBuild'], 'true'))
+        displayName: Deploy to Dev Portal
