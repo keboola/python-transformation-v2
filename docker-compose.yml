@@ -5,6 +5,7 @@ services:
       context: .
       args:
         BASE_IMAGE_NAME: keboola.azurecr.io/docker-custom-python
+        BEFORE_SCRIPT: python-transformation.py
     image: keboola/python-transformation-v2
     user: www-data
     tty: true
@@ -15,6 +16,7 @@ services:
       context: .
       args:
         BASE_IMAGE_NAME: keboola.azurecr.io/docker-python-snowpark
+        BEFORE_SCRIPT: python-snowpark-transformation.py
     image: keboola/python-snowpark-transformation
     user: www-data
     tty: true
