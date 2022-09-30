@@ -1,6 +1,7 @@
 ARG BASE_IMAGE_NAME
 ARG BASE_IMAGE_TAG
 FROM ${BASE_IMAGE_NAME}:${BASE_IMAGE_TAG}
+ARG BEFORE_SCRIPT
 
 # Create directory for user packages
 # This directory is usually created automatically by pip
@@ -13,6 +14,10 @@ RUN mkdir -p $(su www-data -s /bin/bash -c "python -c 'import site; print(site.U
 # Make home directory writable
 RUN chown -R www-data:www-data /var/www
 
-COPY . /code/
 WORKDIR /code/
+COPY ./src ./src
+COPY ./tests ./tests
+COPY main.py README.md ./
+COPY beforeScripts/${BEFORE_SCRIPT} ./beforeScript.py
+
 CMD ["python", "-X", "faulthandler", "-u", "/code/main.py"]
