@@ -1,7 +1,6 @@
 ARG BASE_IMAGE_NAME
 ARG BASE_IMAGE_TAG
 FROM ${BASE_IMAGE_NAME}:${BASE_IMAGE_TAG}
-ARG BEFORE_SCRIPT
 
 # Create directory for user packages
 # This directory is usually created automatically by pip
@@ -18,6 +17,5 @@ WORKDIR /code/
 COPY ./src ./src
 COPY ./tests ./tests
 COPY main.py README.md ./
-COPY beforeScripts/${BEFORE_SCRIPT} ./beforeScript.py
 
 CMD ["python", "-X", "faulthandler", "-u", "/code/main.py"]

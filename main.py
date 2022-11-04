@@ -1,5 +1,3 @@
-import beforeScript
-
 from src.transformation import Transformation
 import sys
 import traceback
