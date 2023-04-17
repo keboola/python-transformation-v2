@@ -16,5 +16,7 @@ RUN chown -R www-data:www-data /var/www
 WORKDIR /code/
 COPY . .
 
+RUN . $VIRTUAL_ENV"/bin/activate" && pip freeze
+
 CMD . $VIRTUAL_ENV"/bin/activate" && python -X faulthandler -u /code/main.py
 #CMD [".", $VIRTUAL_ENV"/bin/activate", "&&", "python", "-X", "faulthandler", "-u", "/code/main.py"]

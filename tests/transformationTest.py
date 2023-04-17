@@ -1,4 +1,4 @@
-from src.transformation import Transformation
+from kbc_transformation.transformation import Transformation
 import unittest
 import os
 import shutil

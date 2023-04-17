@@ -40,7 +40,7 @@ jobs:
       - script: docker-compose build --build-arg BASE_IMAGE_TAG=${{ parameters.baseImageTagPrefix }}$(BASE_TAG) ${{ parameters.componentName }}
         displayName: Build
 
-      - script: docker-compose run --rm --entrypoint python ${{ parameters.componentName }} -m unittest tests/transformationTest.py
+      - script: docker-compose run --rm --entrypoint $VIRTUAL_ENV/bin/python ${{ parameters.componentName }} -m unittest tests/transformationTest.py
         displayName: Run tests
 
       - script: |
