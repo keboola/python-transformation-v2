@@ -15,7 +15,7 @@ RUN chown -R www-data:www-data /var/www
 
 WORKDIR /code/
 
-COPY ./src ./src
+COPY ./kbc_transformation ./kbc_transformation
 COPY ./tests ./tests
 COPY main.py README.md ./
 
