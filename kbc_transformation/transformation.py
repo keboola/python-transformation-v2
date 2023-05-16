@@ -84,7 +84,7 @@ class Transformation:
         import sys
         for package in packages:
             args = [
-                sys.executable,
+                os.environ['VIRTUAL_ENV'] + '/bin/python',
                 '-m', 'pip', 'install',
                 '--disable-pip-version-check',
                 '--no-cache-dir',
@@ -92,7 +92,7 @@ class Transformation:
                 '--force-reinstall',
                 package
             ]
-            if subprocess.call(args) != 0:
+            if subprocess.call(args, stderr=sys.stdout.buffer) != 0:
                 raise ValueError('Failed to install package: ' + package)
 
     @staticmethod
