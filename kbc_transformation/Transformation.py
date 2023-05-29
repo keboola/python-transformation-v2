@@ -83,18 +83,30 @@ class Transformation:
     def install_packages(packages):
         import subprocess
         import sys
+        import os
+
+        if len(packages) == 0:
+            print('No packages to install')
+            return
+
+        with open('requirements.txt', mode='wt') as requirementsFile:
+            requirementsFile.write("\n".join(packages))
 
         args = [
             os.environ['VIRTUAL_ENV'] + '/bin/python',
-            '-m', 'pip', 'install', ','.join(packages),
+            '-m', 'pip', 'install',
             '--disable-pip-version-check',
             '--no-cache-dir',
             '--no-warn-script-location',  # ignore error: installed in '/var/www/.local/bin' which is not on PATH.
             '--force-reinstall',
-            package
+            '-r',
+            'requirements.txt'
         ]
+
         if subprocess.call(args, stderr=sys.stdout.buffer) != 0:
+            os.remove('requirements.txt')
             raise ValueError('Failed to install packages')
+        os.remove('requirements.txt')
 
     @staticmethod
     def prepare_tagged_files(cfg, tags):

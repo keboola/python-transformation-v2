@@ -1,4 +1,4 @@
-from kbc_transformation.transformation import Transformation
+from kbc_transformation import Transformation
 import unittest
 import os
 import shutil
@@ -20,7 +20,7 @@ class TransformationTest(unittest.TestCase):
     def test_long_script_text(self):
         data_dir = self.data_dir + '/longScript/'
         result_file = os.path.abspath(data_dir + '/out/tables/sample.csv')
-        app = Transformation(data_dir)
+        app = Transformation.Transformation(data_dir)
         app.execute()
 
         self.assertTrue(os.path.isfile(result_file))
@@ -33,13 +33,13 @@ class TransformationTest(unittest.TestCase):
 
     def test_emptyConfig(self):
         data_dir = self.data_dir + '/emptyConfig/'
-        app = Transformation(data_dir)
+        app = Transformation.Transformation(data_dir)
         app.execute()
 
     def test_transformData(self):
         data_dir = self.data_dir + '/transformData/'
         result_file = os.path.abspath(data_dir + '/out/tables/sample.csv')
-        app = Transformation(data_dir)
+        app = Transformation.Transformation(data_dir)
         app.execute()
 
         self.assertTrue(os.path.isfile(result_file))
@@ -52,7 +52,7 @@ class TransformationTest(unittest.TestCase):
     def test_package(self):
         data_dir = self.data_dir + '/package/'
         result_file = os.path.abspath(data_dir + '/out/files/out.txt')
-        app = Transformation(data_dir)
+        app = Transformation.Transformation(data_dir)
         app.execute()
         with open(result_file, 'rt') as file:
             # Cup of coffee, result of the "art" package
@@ -64,7 +64,7 @@ class TransformationTest(unittest.TestCase):
         # may alter current working directory
         result_dir = os.path.abspath(data_dir)
 
-        app = Transformation(data_dir)
+        app = Transformation.Transformation(data_dir)
         app.execute()
 
         self.assertTrue(os.path.isfile(result_dir + '/in/user/pokus'))
@@ -77,14 +77,13 @@ class TransformationTest(unittest.TestCase):
 
     def test_package_error(self):
         data_dir = self.data_dir + '/failedInstallPackages/'
-        app = Transformation(data_dir)
-        with self.assertRaisesRegex(ValueError, "Failed to install package: "
-                                                "some-non-existent-package"):
+        app = Transformation.Transformation(data_dir)
+        with self.assertRaisesRegex(ValueError, "Failed to install packages"):
             app.execute()
 
     def test_script_syntax_error(self):
         data_dir = self.data_dir + '/scriptSyntaxError/'
-        app = Transformation(data_dir)
+        app = Transformation.Transformation(data_dir)
         with self.assertRaisesRegex(ValueError, "Script failed."):
             app.execute()
 
@@ -94,7 +93,7 @@ class TransformationTest(unittest.TestCase):
         # may alter current working directory
         result_dir = os.path.abspath(data_dir)
 
-        app = Transformation(data_dir)
+        app = Transformation.Transformation(data_dir)
         app.execute()
 
         self.assertTrue(os.path.isfile(result_dir + '/hello.txt'))
