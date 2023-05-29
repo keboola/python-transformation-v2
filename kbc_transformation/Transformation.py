@@ -3,6 +3,7 @@ from keboola import docker
 import os
 import sys
 
+
 class Transformation:
     def __init__(self, data_dir=None):
         self.dataDir = data_dir
@@ -74,7 +75,7 @@ class Transformation:
     @staticmethod
     def script_excerpt(script):
         if len(script) > 1000:
-            return script[0 : 500] + '\n...\n' + script[-500]
+            return script[0: 500] + '\n...\n' + script[-500]
         else:
             return script
 
@@ -82,18 +83,18 @@ class Transformation:
     def install_packages(packages):
         import subprocess
         import sys
-        for package in packages:
-            args = [
-                os.environ['VIRTUAL_ENV'] + '/bin/python',
-                '-m', 'pip', 'install',
-                '--disable-pip-version-check',
-                '--no-cache-dir',
-                '--no-warn-script-location', # ignore error: installed in '/var/www/.local/bin' which is not on PATH.
-                '--force-reinstall',
-                package
-            ]
-            if subprocess.call(args, stderr=sys.stdout.buffer) != 0:
-                raise ValueError('Failed to install package: ' + package)
+
+        args = [
+            os.environ['VIRTUAL_ENV'] + '/bin/python',
+            '-m', 'pip', 'install', ','.join(packages),
+            '--disable-pip-version-check',
+            '--no-cache-dir',
+            '--no-warn-script-location',  # ignore error: installed in '/var/www/.local/bin' which is not on PATH.
+            '--force-reinstall',
+            package
+        ]
+        if subprocess.call(args, stderr=sys.stdout.buffer) != 0:
+            raise ValueError('Failed to install packages')
 
     @staticmethod
     def prepare_tagged_files(cfg, tags):
