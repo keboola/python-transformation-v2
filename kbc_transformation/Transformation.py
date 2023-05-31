@@ -102,11 +102,11 @@ class Transformation:
             '-r',
             'requirements.txt'
         ]
-
-        if subprocess.call(args, stderr=sys.stdout.buffer) != 0:
-            os.remove('requirements.txt')
-            raise ValueError('Failed to install packages')
+        process_result = subprocess.call(args, stderr=sys.stdout.buffer)
         os.remove('requirements.txt')
+        if process_result != 0:
+            raise ValueError('Failed to install packages')
+
 
     @staticmethod
     def prepare_tagged_files(cfg, tags):
