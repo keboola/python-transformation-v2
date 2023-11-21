@@ -1,11 +1,12 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='kbc_transformation',
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
     url='https://github.com/keboola/python-transformation-v2',
-    packages=find_packages(exclude=['tests']),
+    packages=['kbc_transformation'],
+    package_dir={'': 'kbc_transformation'},
     requires=['pip'],
     license="MIT"
 )
