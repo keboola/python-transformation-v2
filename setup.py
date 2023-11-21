@@ -6,7 +6,6 @@ setup(
     setup_requires=['setuptools_scm'],
     url='https://github.com/keboola/python-transformation-v2',
     packages=['kbc_transformation'],
-    package_dir={'': 'kbc_transformation'},
     requires=['pip'],
     license="MIT"
 )
