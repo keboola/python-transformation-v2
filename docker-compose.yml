@@ -1,6 +1,6 @@
 version: '3'
 services:
-  python-transformation-v2: &main
+  python-transformation-v2: &python
     build:
       context: .
       args:
@@ -11,7 +11,7 @@ services:
     tty: true
     stdin_open: true
 
-  python-snowpark-transformation:
+  python-snowpark-transformation: &snowpark
     build:
       context: .
       args:
@@ -23,14 +23,23 @@ services:
     stdin_open: true
 
   dev:
-    <<: *main
+    <<: *python
     command: bash
     volumes:
       - ./:/code
       - ./data:/data
 
-  tests:
-    <<: *main
+  python-transformation-v2_tests:
+    <<: *python
+    command: python3 -m unittest tests/transformationTest.py tests/pipConfigTest.py
+    volumes:
+      - ./:/code
+      - ./data:/data
+    depends_on:
+      - pypi-mirror
+
+  python-snowpark-transformation_tests:
+    <<: *snowpark
     command: python3 -m unittest tests/transformationTest.py tests/pipConfigTest.py
     volumes:
       - ./:/code
