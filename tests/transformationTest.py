@@ -111,7 +111,7 @@ class TransformationTest(unittest.TestCase):
             self.assertEqual('c[_]', file.read().strip())
 
     def test_pip_repositories_error(self):
-        data_dir = self.data_dir + '/pipRepositories_error/'
+        data_dir = self.data_dir + '/pipRepositoriesError/'
         result_file = os.path.abspath(data_dir + '/out/files/out.txt')
         app = Transformation(data_dir)
 

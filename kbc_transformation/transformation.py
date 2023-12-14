@@ -18,14 +18,8 @@ class Transformation:
         with open(self.pipFile, 'w') as file:
             file.write(self.create_pip_config(cfg.parameters, cfg.image_parameters))
 
-        image_parameters = cfg.image_parameters
-        try:
-            artifactory_url = image_parameters['artifactory_url']
-            trusted_host = image_parameters['trusted_host']
-            self.install_packages(packages, artifactory_url=artifactory_url, trusted_host=trusted_host, cert='/code/artifacts/cair3.cer')
-        except KeyError:
-            print("Could not find artifactory url, using default pypi")
-            self.install_packages(parameters.get('packages', []))
+        #install packages
+        self.install_packages(parameters.get('packages', []))    
 
         blocks = parameters.get('blocks')
         if blocks is not None:
