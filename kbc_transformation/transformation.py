@@ -1,37 +1,43 @@
 # coding=utf-8
-from keboola import docker
+from keboola.component import CommonInterface
 import os
 import sys
 
 class Transformation:
     def __init__(self, data_dir=None):
         self.dataDir = data_dir
+        self.pipFile = os.environ.get('PIP_CONFIG_FILE', '/tmp/pip.conf')
 
     def execute(self):
-        cfg = docker.Config(self.dataDir)
-        parameters = cfg.get_parameters()
+        ci = CommonInterface(data_folder_path = self.dataDir)
+        cfg = ci.configuration
+
+        parameters = cfg.parameters
+
+        # setup PIP repositories
+        with open(self.pipFile, 'w') as file:
+            file.write(self.create_pip_config(cfg.parameters, cfg.image_parameters))
 
         # install packages
-        packages = parameters.get('packages')
-        if packages is None:
-            packages = []
+        self.install_packages(parameters.get('packages', []))
 
-        self.install_packages(packages)
-
-        # prepare tagged files
-        tags = parameters.get('tags')
-        if tags is None:
-            tags = []
-        self.prepare_tagged_files(cfg, tags)
+        image_parameters = cfg.image_parameters
+        try:
+            artifactory_url = image_parameters['artifactory_url']
+            trusted_host = image_parameters['trusted_host']
+            self.install_packages(packages, artifactory_url=artifactory_url, trusted_host=trusted_host, cert='/code/artifacts/cair3.cer')
+        except KeyError:
+            print("Could not find artifactory url, using default pypi")
+            self.install_packages(packages)
 
         blocks = parameters.get('blocks')
         if blocks is not None:
             # Process and execute transformation scripts
-            script_file = cfg.get_data_dir() + 'script.py'
+            script_file = self.dataDir + 'script.py'
             file = open(script_file, 'w+')
             self.process_blocks(blocks, file)
             file.seek(os.SEEK_SET)
-            self.execute_script_file(cfg, file)
+            self.execute_script_file(ci, file)
             file.close()
 
     def process_blocks(self, blocks, file):
@@ -50,12 +56,15 @@ class Transformation:
             file.write(script)
             file.write('\n')
 
-    def execute_script_file(self, cfg, file):
+    def execute_script_file(self, ci, file):
         import traceback
 
+        # Configure custom pip.conf
+        os.environ['PIP_CONFIG_FILE'] = self.pipFile
+
         # Change current working directory so that relative paths work
-        os.chdir(cfg.get_data_dir())
-        sys.path.append(cfg.get_data_dir())
+        os.chdir(self.dataDir)
+        sys.path.append(self.dataDir)
 
         try:
             with file as file:
@@ -96,36 +105,55 @@ class Transformation:
                 raise ValueError('Failed to install package: ' + package)
 
     @staticmethod
-    def prepare_tagged_files(cfg, tags):
-        """
-        When supplied a list of tags, select input files with the given tags and prepare the
-        most recent file of those into a /user/ folder
-        Args:
-            cfg: keboola.docker.Config object
-            tags: List of tag names.
-        """
-        from datetime import datetime, timezone
-        from shutil import copyfile
+    def script_excerpt(script):
+        if len(script) > 1000:
+            return script[0 : 500] + '\n...\n' + script[-500]
+        else:
+            return script
 
-        if not os.path.exists(os.path.join(cfg.get_data_dir(), 'in', 'user')):
-            os.makedirs(os.path.join(cfg.get_data_dir(), 'in', 'user'))
+    @staticmethod
+    def create_pip_config(parameters, image_parameters):
+        from urllib.parse import urlparse, urlunparse
 
-        for tag in tags:
-            last_time = datetime(1, 1, 1, 0, 0, 0, 0, timezone.utc)
-            last_manifest = ''
-            for file in cfg.get_input_files():
-                manifest = cfg.get_file_manifest(file)
-                if tag in manifest['tags']:
-                    file_time = datetime.strptime(manifest['created'],
-                                                  '%Y-%m-%dT%H:%M:%S%z')
-                    if file_time > last_time:
-                        last_time = file_time
-                        last_manifest = file
-            if last_manifest == '':
-                raise ValueError("No files were found for tag: " + tag)
+        repositories = [
+            *parameters.get('pip_repositories', []),
+            *image_parameters.get('pip_repositories', []),
+        ]
+
+        index_url = None
+        extra_index_urls = []
+        trusted_hosts = []
+
+        for repository in repositories:
+            parsed_url = urlparse(repository['url'])
+
+            if repository.get('add_trusted_host', False):
+                trusted_hosts.append(parsed_url.netloc)
+
+            repo_credentials = repository.get('#credentials')
+            if repo_credentials:
+                url_with_credentials = repo_credentials + '@' + parsed_url.hostname
+                if parsed_url.port:
+                    url_with_credentials += ':' + str(parsed_url.port)
+
+                parsed_url = parsed_url._replace(netloc=url_with_credentials)
+
+            if index_url == None:
+                index_url = urlunparse(parsed_url)
             else:
-                copyfile(last_manifest,
-                         os.path.join(cfg.get_data_dir(), 'in', 'user', tag))
-                copyfile(last_manifest + '.manifest',
-                         os.path.join(cfg.get_data_dir(), 'in', 'user',
-                                      tag + '.manifest'))
+                extra_index_urls.append(urlunparse(parsed_url))
+
+        pip_conf_lines = [
+            '[global]'
+        ]
+
+        if index_url != None:
+            pip_conf_lines.append('index-url = ' + index_url)
+
+        if len(extra_index_urls) > 0:
+            pip_conf_lines.append('extra-index-url = ' + ' '.join(extra_index_urls))
+
+        if len(trusted_hosts) > 0:
+            pip_conf_lines.append('trusted-host = ' + ' '.join(trusted_hosts))
+
+        return "\n".join(pip_conf_lines) + "\n"
