@@ -1,0 +1,29 @@
+{
+    "parameters": {
+        "pip_repositories": [
+            {"url": "http://pypi-mirror/simple", "add_trusted_host": true}
+        ],
+        "packages": ["art"],
+        "blocks": [
+            {
+                "name": "block 1",
+                "codes": [
+                    {
+                        "name":"code 1",
+                        "script": [
+                            "from art import *",
+                            "outFilePath = 'out/files/out.txt'",
+                            "with open(outFilePath, 'wt') as file:",
+                            "  file.write(art(\"coffee\"))"
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "image_parameters": {
+        "pip_repositories": [
+            {"url": "https://example.com", "add_trusted_host": true}
+        ]
+    }
+}

@@ -100,3 +100,20 @@ class TransformationTest(unittest.TestCase):
         self.assertTrue(os.path.isfile(result_dir + '/hello.txt'))
         with open(result_dir + '/hello.txt', 'rt') as sample:
             self.assertEqual('I was imported\n', sample.read())
+
+    def test_pip_repositories(self):
+        data_dir = self.data_dir + '/pipRepositories/'
+        result_file = os.path.abspath(data_dir + '/out/files/out.txt')
+        app = Transformatyion(data_dir)
+        app.execute()
+        with open(result_file, 'rt') as file:
+            # Cup of coffee, result of the "art" package
+            self.assertEqual('c[_]', file.read().strip())
+
+    def test_pip_repositories_error(self):
+        data_dir = self.data_dir + '/pipRepositories_error/'
+        result_file = os.path.abspath(data_dir + '/out/files/out.txt')
+        app = Transformation(data_dir)
+
+        with self.assertRaisesRegex(ValueError, "Failed to install package: matrix"):
+            app.execute()
