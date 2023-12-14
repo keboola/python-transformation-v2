@@ -104,7 +104,7 @@ class TransformationTest(unittest.TestCase):
     def test_pip_repositories(self):
         data_dir = self.data_dir + '/pipRepositories/'
         result_file = os.path.abspath(data_dir + '/out/files/out.txt')
-        app = Transformatyion(data_dir)
+        app = Transformation(data_dir)
         app.execute()
         with open(result_file, 'rt') as file:
             # Cup of coffee, result of the "art" package
