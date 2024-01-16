@@ -19,7 +19,7 @@ class Transformation:
             file.write(self.create_pip_config(cfg.parameters, cfg.image_parameters))
 
         #install packages
-        self.install_packages(parameters.get('packages', []))    
+        self.install_packages(parameters.get('packages', []))
 
         blocks = parameters.get('blocks')
         if blocks is not None:
@@ -92,7 +92,7 @@ class Transformation:
                 '--force-reinstall',
                 package
             ]
-            if subprocess.call(args, stderr=sys.stdout.buffer) != 0:
+            if subprocess.call(args) != 0:
                 raise ValueError('Failed to install package: ' + package)
 
     @staticmethod
