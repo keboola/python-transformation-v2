@@ -29,7 +29,7 @@ services:
 
   python-transformation-v2_tests:
     <<: *python
-    command: /home/default/bin/python -m unittest tests/transformationTest.py tests/pipConfigTest.py
+    command: /home/default/bin/python -m unittest  -v -b tests/transformationTest.py tests/pipConfigTest.py
     volumes:
       - ./:/code
       - ./data:/data
@@ -38,7 +38,7 @@ services:
 
   python-snowpark-transformation_tests:
     <<: *snowpark
-    command: /home/default/bin/python -m unittest tests/transformationTest.py tests/pipConfigTest.py
+    command: /home/default/bin/python -m unittest  -v -b tests/transformationTest.py tests/pipConfigTest.py
     volumes:
       - ./:/code
       - ./data:/data
