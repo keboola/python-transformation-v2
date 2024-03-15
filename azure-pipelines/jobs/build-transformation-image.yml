@@ -40,6 +40,9 @@ jobs:
       - script: docker-compose build --build-arg BASE_IMAGE_TAG=${{ parameters.baseImageTagPrefix }}$(BASE_TAG) ${{ parameters.componentName }}
         displayName: Build
 
+      - script: docker-compose run --rm bandersnatch bandersnatch mirror
+        displayName: Init pypi mirror
+
       - script: docker-compose run --rm ${{ parameters.componentName }}_tests
         displayName: Run tests
 
