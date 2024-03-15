@@ -1,0 +1,21 @@
+{
+    "parameters": {
+        "packages": ["matrix"],
+        "blocks": [
+            {
+                "name": "block 1",
+                "codes": [
+                    {
+                        "name":"code 1",
+                        "script": []
+                    }
+                ]
+            }
+        ]
+    },
+    "image_parameters": {
+        "pip_repositories": [
+            {"url": "http://pypi-mirror/simple", "add_trusted_host": true}
+        ]
+    }
+}

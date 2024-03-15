@@ -1,4 +1,6 @@
 /vendor
 /data
 .idea
-**/__py_cache__
+tmp/
+venv/
+**/__pycache__
