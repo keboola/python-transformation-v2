@@ -1,6 +1,6 @@
 {
     "parameters": {
-        "packages": ["art"],
+        "packages": ["matrix", "art"],
         "blocks": [
             {
                 "name": "block 1",
