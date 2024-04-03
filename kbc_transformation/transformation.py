@@ -71,13 +71,6 @@ class Transformation:
                                       file=sys.stderr, chain=True)
             raise ValueError('Script failed.')
 
-    @staticmethod
-    def script_excerpt(script):
-        if len(script) > 1000:
-            return script[0 : 500] + '\n...\n' + script[-500]
-        else:
-            return script
-
     def install_packages(self, packages):
         from subprocess import run
         import sys
