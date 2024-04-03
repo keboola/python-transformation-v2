@@ -10,7 +10,8 @@ pip install --upgrade git+git://github.com/keboola/python-transformation-v2.git
 
 ### Dev
 - clone the repo
-- `docker-compose build --build-arg BASE_IMAGE_TAG=python-3.8-6.0.0 python-transformation-v2` (or provide the tag you want)
+- `docker compose build --build-arg BASE_IMAGE_TAG=python-3.8-6.0.0 python-transformation-v2` (or provide the tag you want)
+- `docker compose run --rm bandersnatch bandersnatch mirror` (init the pypi-mirror)
 
 ### Run tests
-- `docker-compose run --rm python-transformation-v2`
+- `docker compose run --rm python-transformation-v2`

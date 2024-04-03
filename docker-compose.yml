@@ -1,28 +1,66 @@
 version: '3'
 services:
-  python-transformation-v2: &main
+  python-transformation-v2: &python
     build:
       context: .
       args:
         BASE_IMAGE_NAME: keboola.azurecr.io/docker-custom-python
+        BASE_IMAGE_TAG: python-3.10-7.0.3
     image: keboola/python-transformation-v2
     user: www-data
     tty: true
     stdin_open: true
 
-  python-snowpark-transformation:
+  python-snowpark-transformation: &snowpark
     build:
       context: .
       args:
         BASE_IMAGE_NAME: keboola.azurecr.io/docker-python-snowpark
+        BASE_IMAGE_TAG: python-3.8-7.0.3
     image: keboola/python-snowpark-transformation
     user: www-data
     tty: true
     stdin_open: true
 
   dev:
-    <<: *main
+    <<: *python
     command: bash
     volumes:
       - ./:/code
       - ./data:/data
+
+  python-transformation-v2_tests:
+    <<: *python
+    command: /home/default/bin/python -m unittest tests/transformationTest.py tests/pipConfigTest.py
+    volumes:
+      - ./:/code
+      - ./data:/data
+    depends_on:
+      - pypi-mirror
+
+  python-snowpark-transformation_tests:
+    <<: *snowpark
+    command: /home/default/bin/python -m unittest tests/transformationTest.py tests/pipConfigTest.py
+    volumes:
+      - ./:/code
+      - ./data:/data
+    depends_on:
+      - pypi-mirror
+
+  bandersnatch:
+    image: pypa/bandersnatch:6.4.0
+    command: bandersnatch mirror
+    volumes:
+      - ./bandersnatch.conf:/etc/bandersnatch.conf
+      - ./tmp/pypi_data:/srv/pypi
+
+  pypi-mirror:
+    image: janlo/pypi-mirror-nginx
+    volumes:
+      - ./tmp/pypi_data/web:/web
+    ports:
+      - 127.0.0.1:8080:80
+    environment:
+      - PYPI_SERVER_NAME=pypi-mirror
+    depends_on:
+      - bandersnatch

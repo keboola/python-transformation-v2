@@ -37,10 +37,13 @@ jobs:
           command: login
           containerRegistry: $(azureContainerRegistry)
 
-      - script: docker-compose build --build-arg BASE_IMAGE_TAG=${{ parameters.baseImageTagPrefix }}$(BASE_TAG) ${{ parameters.componentName }}
+      - script: docker compose build --build-arg BASE_IMAGE_TAG=${{ parameters.baseImageTagPrefix }}$(BASE_TAG) ${{ parameters.componentName }}
         displayName: Build
 
-      - script: docker-compose run --rm ${{ parameters.componentName }} /home/default/bin/python -m unittest tests/transformationTest.py
+      - script: docker compose run --rm bandersnatch bandersnatch mirror
+        displayName: Init pypi mirror
+
+      - script: docker compose run --rm ${{ parameters.componentName }}_tests
         displayName: Run tests
 
       - script: |
