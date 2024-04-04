@@ -86,9 +86,10 @@ class Transformation:
                 package
             ]
 
-            p = run(args, capture_output = True, env={
-                'PIP_CONFIG_FILE': self.pipFile,
-            })
+            env = os.environ.copy()
+            env['PIP_CONFIG_FILE'] = self.pipFile
+
+            p = run(args, capture_output = True, env=env)
             print(p.stdout.decode())
             if p.returncode != 0:
                 print(p.stderr.decode())
