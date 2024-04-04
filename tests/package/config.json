@@ -1,6 +1,6 @@
 {
     "parameters": {
-        "packages": ["art"],
+        "packages": ["pysftp", "art"],
         "blocks": [
             {
                 "name": "block 1",
