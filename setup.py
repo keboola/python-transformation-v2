@@ -7,5 +7,6 @@ setup(
     url='https://github.com/keboola/python-transformation-v2',
     packages=['kbc_transformation'],
     requires=['pip'],
+    install_requires=['keboola.component'],
     license="MIT"
 )
