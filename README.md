@@ -1,3 +1,15 @@
+> [!WARNING]
+> **Deprecated — this repository is no longer used to build images.**
+>
+> The `keboola.python-transformation-v2` image is now built and published from the
+> [keboola/runtime-images](https://github.com/keboola/runtime-images) monorepo, in the
+> [`python-transformation-v2`](https://github.com/keboola/runtime-images/tree/main/python-transformation-v2)
+> directory. That workflow builds one image per supported Python version and pushes the **same** image
+> to the Developer Portal ECR under both `keboola.python-transformation-v2` and
+> `keboola.csas-python-transformation-v2`.
+>
+> Make all changes there. This repository is kept for history only and its code is not released.
+
 [![Build Status](https://dev.azure.com/keboola-dev/Data%20Science/_apis/build/status/keboola.python-transformation-v2?branchName=master)](https://dev.azure.com/keboola-dev/Data%20Science/_build/latest?definitionId=74&branchName=master)
 
 Application which runs KBC transformations writen in Python, interface is provided by [docker-bundle](https://github.com/keboola/docker-bundle).
